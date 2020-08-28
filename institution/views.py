@@ -37,7 +37,7 @@ class InstituteViewSet(viewsets.GenericViewSet):
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
 	def create(self, request):
-		inst = InstituteSignupSerializer(data = request.data)
+		inst = InstituteSerializer(data = request.data)
 		email = request.data['email']
 		pwd = request.data['password']
 		user = CustomUser.objects.create_user(email, pwd)
@@ -48,8 +48,7 @@ class InstituteViewSet(viewsets.GenericViewSet):
 				user.save()
 				return Response("Saved event successfully.", status=status.HTTP_201_CREATED)
 			except:
-				print(errors)
-				return Response(inst.errors, status=status.HTTP_401_UNAUTHORIZED)
+				return Response(user.errors, status=status.HTTP_401_UNAUTHORIZED)
 		
 		return Response(inst.errors, status=status.HTTP_401_UNAUTHORIZED)
 
