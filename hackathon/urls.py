@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('', views.opendocs, name="opendocs"),
-    path('institution/', include('institution.urls'))
+    path('institution/', include('institution.urls')),
+    path('teacher/', include('teacher.urls'))
 
 ]
