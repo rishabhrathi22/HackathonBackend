@@ -8,7 +8,7 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import action
 
-from .serializers import TeacherSerializer, TeacherSignupSerializer, TeacherLoginSerializer
+from .serializers import TeacherSerializer, TeacherSignupSerializer, TeacherLoginSerializer, TeacherChangePasswordSerializer
 
 from .models import Teacher
 from institution.models import Institute
@@ -25,6 +25,7 @@ class TeacherViewSet(viewsets.GenericViewSet):
 
 	serializer_classes = {
 		'login': TeacherLoginSerializer,
+		'change_password': TeacherChangePasswordSerializer,
 	}
 
 	model = Teacher
@@ -38,6 +39,14 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		serializer = TeacherSerializer(self.queryset, many=True)	
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+	def retrieve(self, request, name):
+			try:
+				teacher = Teacher.objects.filter(name = name).first()
+				serializer = TeacherSerializer(teacher)
+				return Response(serializer.data, status=status.HTTP_200_OK)
+			except:
+				return Response("Invalid teacher name.", status=status.HTTP_404_NOT_FOUND)
 
 	def create(self, request):
 		ser_data = TeacherSignupSerializer(data = request.data)
@@ -69,3 +78,23 @@ class TeacherViewSet(viewsets.GenericViewSet):
 			return Response("Successfully logged in.", status=status.HTTP_201_CREATED)
 
 		return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)	
+
+	def change_password(self, request, name):
+		email = request.data['email']
+		pwd = request.data['password']
+		pwd2 = request.data['newpass']
+        
+		if pwd!=pwd2:
+			return Response("password1 not equal to password2", status=status.HTTP_401_UNAUTHORIZED)
+
+
+		if verifyUser(email, pwd):
+			try:
+				user = CustomUser.objects.get(email = email)
+				user.set_password(pwd2)
+				user.save()
+				return Response("Password updated successfully.", status=status.HTTP_201_CREATED)
+			except:
+				return Response("Invalid response.", status=status.HTTP_401_UNAUTHORIZED)
+
+		return Response("Invalid Credentials", status=status.HTTP_401_UNAUTHORIZED)	

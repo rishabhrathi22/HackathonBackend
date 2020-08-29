@@ -19,3 +19,8 @@ class TeacherSignupSerializer(serializers.Serializer):
 class TeacherLoginSerializer(serializers.Serializer):
 	email = serializers.EmailField()
 	password = serializers.CharField(max_length=200)
+
+class TeacherChangePasswordSerializer(serializers.Serializer):
+	email = serializers.EmailField()
+	password = serializers.CharField(max_length=200)
+	newpass = serializers.CharField(max_length=200)
