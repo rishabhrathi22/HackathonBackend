@@ -16,12 +16,13 @@ class InstituteSignupSerializer(serializers.Serializer):
 	website = serializers.URLField(max_length=200)
 	password = serializers.CharField(max_length=200)
 
-	"""
-	class Meta:
-		model = Institute
-		fields = ('institution_name', 'email', 'password', 'contact_person', 'phone_number', 'website')
-	"""
 
 class InstituteLoginSerializer(serializers.Serializer):
 	email = serializers.EmailField()
 	password = serializers.CharField(max_length=200)
+
+
+class InstituteChangePasswordSerializer(serializers.Serializer):
+	email = serializers.EmailField()
+	password = serializers.CharField(max_length=200)
+	newpass = serializers.CharField(max_length=200)
