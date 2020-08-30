@@ -84,9 +84,6 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		pwd = request.data['password']
 		pwd2 = request.data['newpass']
         
-		if pwd!=pwd2:
-			return Response("password1 not equal to password2", status=status.HTTP_401_UNAUTHORIZED)
-
 
 		if verifyUser(email, pwd):
 			try:
