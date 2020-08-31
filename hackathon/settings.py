@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'institution',
     'teacher',
+    'classroom',
     'rest_framework',
     'users',
     'drf_yasg',
