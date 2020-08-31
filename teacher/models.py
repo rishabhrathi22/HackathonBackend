@@ -1,7 +1,6 @@
 from django.db import models
 from institution.models import Institute
 
-# Create your models here.
 class Teacher(models.Model):
 	institution = models.ForeignKey(Institute, on_delete=models.CASCADE, default=None)
 	email = models.EmailField(unique = True)

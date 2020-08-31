@@ -10,14 +10,8 @@ from .serializers import AdminSignupSerializer
 
 @api_view(['POST'])
 def mainview(request):
-	# serializer = AdminSignupSerializer(data=request.POST)
-	# print(serializer)
-	# if serializer.is_valid():
 	email = request.data['email']
 	pwd = request.data['password']
 	user = CustomUser.objects.create_superuser(email, pwd)
-	print(user)
 	user.save()
 	return Response("Saved successfully!!", status=status.HTTP_201_CREATED)
-
-	return Response("Invalid request")
