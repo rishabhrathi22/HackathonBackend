@@ -67,14 +67,14 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		inst_email = request.data['institution_email']
 		email = request.data['email']
 		name = request.data['name']
-		mobile_no = request.data['mobile_number']
+		mobile_no = request.data['phone_number']
 		pwd = request.data['password']
 		user = CustomUser.objects.create_user(email, pwd)
 
 		if ser_data.is_valid():
 			try:
 				inst = Institute.objects.filter(email = inst_email).first()
-				new_teacher = Teacher(email=email, name=name, mobile_number = mobile_no, institution = inst) 
+				new_teacher = Teacher(email=email, name=name, phone_number = mobile_no, institution = inst) 
 				user.save()
 				new_teacher.save()
 				return Response("Saved teacher successfully!!", status=status.HTTP_201_CREATED)
