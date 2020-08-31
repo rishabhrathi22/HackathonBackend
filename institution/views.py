@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
+
 from users.models import CustomUser
 
 from rest_framework.response import Response
@@ -16,37 +17,50 @@ from .models import Institute
 def verifyUser(uname, pwd):
 	user = authenticate(email = uname, password = pwd)
 	if user is not None:
-		return True
+		return user
 	return False
 
 class InstituteViewSet(viewsets.GenericViewSet):    
 	default_serializer_class = InstituteSignupSerializer
+	model = Institute
 
 	serializer_classes = {
 		'login': InstituteLoginSerializer,
 		'change_password': InstituteChangePasswordSerializer,
 	}
 
-	model = Institute
-	queryset = Institute.objects.all().filter(status = 1)
- 
+
+	def get_queryset(self):
+		queryset = Institute.objects.all().filter(status = 1)
+		email = self.request.query_params.get('filterByMail', None)
+		
+		if email is not None:
+			queryset = queryset.filter(email = email)
+			if len(queryset)==0:
+				return None
+
+		return queryset
+
 	
 	def get_serializer_class(self):
 		return self.serializer_classes.get(self.action, self.default_serializer_class)
 
 	
 	def list(self, request):
-		serializer = InstituteSerializer(self.queryset, many=True)
+		queryset = self.get_queryset()
+		if queryset is None:
+			return Response("Does not Exist.", status = status.HTTP_404_NOT_FOUND)
+		serializer = InstituteSerializer(queryset, many=True)
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-	def retrieve(self, request, name):
-		try:
-			inst = Institute.objects.filter(institution_name = name)[0]
-			serializer = InstituteSerializer(inst)
-			return Response(serializer.data, status=status.HTTP_200_OK)
-		except:
-			return Response("Invalid university name.", status=status.HTTP_404_NOT_FOUND)
+	# def retrieve(self, request):
+	# 	try:
+	# 		inst = self.get_queryset()
+	# 		serializer = InstituteSerializer(inst)
+	# 		return Response(serializer.data, status=status.HTTP_200_OK)
+	# 	except:
+	# 		return Response("Invalid university name.", status=status.HTTP_404_NOT_FOUND)
 
 
 	def create(self, request):
@@ -60,7 +74,8 @@ class InstituteViewSet(viewsets.GenericViewSet):
 				inst.save()
 				user.save()
 				return Response("Saved Institute successfully.", status=status.HTTP_201_CREATED)
-			except:
+			except Exception as e:
+				print(e)
 				return Response("Email already present.", status=status.HTTP_401_UNAUTHORIZED)
 		
 		return Response(inst.errors, status=status.HTTP_401_UNAUTHORIZED)
@@ -69,10 +84,15 @@ class InstituteViewSet(viewsets.GenericViewSet):
 	def login(self, request):
 		inst = InstituteLoginSerializer(data = request.data)
 
-		if verifyUser(request.data['email'], request.data['password']):
-			return Response("Successfully logged in.", status=status.HTTP_200_OK)
+		if Institute.objects.filter(email = request.data['email']).exists():
+			user = verifyUser(request.data['email'], request.data['password'])
+			if user is not False:
+				login(request, user)
+				return Response("Successfully logged in.", status=status.HTTP_200_OK)
+			else:
+				return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)	
 
-		return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)
+		return Response("Invalid institution mail.", status=status.HTTP_401_UNAUTHORIZED)
 
 
 	def change_password(self, request, name):
@@ -90,4 +110,9 @@ class InstituteViewSet(viewsets.GenericViewSet):
 				print(e)
 				return Response("Invalid response.", status=status.HTTP_401_UNAUTHORIZED)
 
-		return Response("Invalid Credentials", status=status.HTTP_401_UNAUTHORIZED)	
+		return Response("Invalid Credentials", status=status.HTTP_401_UNAUTHORIZED)
+
+
+	def logout(self, request):
+		logout(request)
+		return Response("Successfully logged out.", status = status.HTTP_200_OK)

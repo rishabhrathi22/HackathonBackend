@@ -15,5 +15,5 @@ urlpatterns = [
 	path('register/', teacher_create),
 	path('login/', teacher_login),
 	path('<str:name>/change_password', teacher_change_pwd),
-	path('<str:name>/', teacher_detail)
+	# path('<str:name>/', teacher_detail)
 ]

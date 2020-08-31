@@ -8,7 +8,6 @@ class TeacherSerializer(serializers.ModelSerializer):
 		model = Teacher
 		fields = '__all__'
 
-
 class TeacherSignupSerializer(serializers.Serializer):
 	institution_email = serializers.EmailField()
 	email = serializers.EmailField()

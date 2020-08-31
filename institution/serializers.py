@@ -7,7 +7,6 @@ class InstituteSerializer(serializers.ModelSerializer):
 		model = Institute
 		fields = '__all__'
 
-
 class InstituteSignupSerializer(serializers.Serializer):
 	institution_name = serializers.CharField(max_length=200)
 	email = serializers.EmailField()
@@ -16,11 +15,9 @@ class InstituteSignupSerializer(serializers.Serializer):
 	website = serializers.URLField(max_length=200)
 	password = serializers.CharField(max_length=200)
 
-
 class InstituteLoginSerializer(serializers.Serializer):
 	email = serializers.EmailField()
 	password = serializers.CharField(max_length=200)
-
 
 class InstituteChangePasswordSerializer(serializers.Serializer):
 	email = serializers.EmailField()
