@@ -12,6 +12,7 @@ from rest_framework.decorators import action
 from .serializers import InstituteSerializer, InstituteSignupSerializer, InstituteLoginSerializer, InstituteChangePasswordSerializer
 
 from .models import Institute
+from teacher.models import Teacher
 
 
 def verifyUser(uname, pwd):
@@ -116,3 +117,17 @@ class InstituteViewSet(viewsets.GenericViewSet):
 	def logout(self, request):
 		logout(request)
 		return Response("Successfully logged out.", status = status.HTTP_200_OK)
+
+
+	def approve_teacher(self, request):
+		if request.user.is_authenticated:
+			teacher = self.request.query_params.get('teacher', None)
+			try:
+				s = Teacher.objects.get(email = teacher)
+				s.status = 1
+				s.save()
+				return Response("Teacher approved successfully.", status=status.HTTP_200_OK)
+			except:
+				return Response("Invalid teacher mail.", status=status.HTTP_404_NOT_FOUND)
+		else:
+			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)		
