@@ -23,6 +23,7 @@ class TeacherViewSet(viewsets.GenericViewSet):
 	model = Teacher
 
 	serializer_classes = {
+		'create': TeacherSignupSerializer,
 		'login': TeacherLoginSerializer,
 		'change_password': TeacherChangePasswordSerializer,
 	}
