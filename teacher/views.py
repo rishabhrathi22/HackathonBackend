@@ -67,7 +67,7 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		inst_email = request.data['institution_email']
 		email = request.data['email']
 		name = request.data['name']
-		mobile_no = request.data['phone_number']
+		mobile_no = request.data['mobile_number']
 		pwd = request.data['password']
 		user = CustomUser.objects.create_user(email, pwd)
 
