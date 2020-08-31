@@ -10,6 +10,7 @@ from .serializers import StudentSerializer, StudentSignupSerializer, StudentLogi
 
 from .models import Student
 from institution.models import Institute
+from teacher.models import Teacher
 
 def verifyUser(uname, pwd):
 	user = authenticate(email = uname, password = pwd)
