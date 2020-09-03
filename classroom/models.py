@@ -23,6 +23,7 @@ class Studentlist(models.Model):
     
 
 class Assignment(models.Model):
+	title = models.CharField(max_length = 200)
 	classroom = models.ForeignKey(Classroom, on_delete = models.CASCADE)
 	date = models.DateTimeField(default=datetime.now)
 	assign_url = models.URLField(default=None)

@@ -193,7 +193,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         if teacher is None or classroom is None: 
             return Response("Bad Request!!", status=status.HTTP_401_UNAUTHORIZED)
         
-        newassign = Assignment(classroom=classroom, assign_url = link)
+        newassign = Assignment(classroom=classroom, assign_url = link, title = request.data['title'])
         newassign.save()
         return Response("new assign created!!", status=status.HTTP_200_OK)
     

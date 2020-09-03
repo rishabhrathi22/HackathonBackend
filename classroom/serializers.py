@@ -27,6 +27,7 @@ class ViewAssignmentSerializer(serializers.ModelSerializer):
 
 
 class NewAssignmentSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length = 200)
     teacher_email = serializers.EmailField()
     classroom_id = serializers.IntegerField()
     assign_url = serializers.URLField(default=None)
