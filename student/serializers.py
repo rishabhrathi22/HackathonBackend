@@ -13,7 +13,6 @@ class StudentSignupSerializer(serializers.Serializer):
 	email = serializers.EmailField()
 	phone_number = serializers.CharField(max_length=15)
 	institution_email = serializers.EmailField()
-	teacher_email = serializers.EmailField()
 	password = serializers.CharField(max_length=200)
 
 class StudentLoginSerializer(serializers.Serializer):

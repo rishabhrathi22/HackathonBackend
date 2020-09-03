@@ -56,7 +56,7 @@ class StudentViewSet(viewsets.GenericViewSet):
 	def create(self, request):
 		ser_data = StudentSignupSerializer(data = request.data)
 		inst_email = request.data['institution_email']
-		teacher_email = request.data['teacher_email']
+		# teacher_email = request.data['teacher_email']
 		email = request.data['email']
 		name = request.data['name']
 		phone_no = request.data['phone_number']
@@ -65,9 +65,10 @@ class StudentViewSet(viewsets.GenericViewSet):
 
 		if ser_data.is_valid():
 			try:
-				inst = Institute.objects.filter(email = inst_email).first()
-				teacher = Teacher.objects.filter(email = teacher_email).first()
-				new_student = Student(email=email, name=name, phone_number = phone_no, institution = inst, teacher = teacher) 
+				inst = Institute.objects.filter(email__iexact = inst_email).first()
+				# teacher = Teacher.objects.filter(email = teacher_email).first()
+				# new_student = Student(email=email, name=name, phone_number = phone_no, institution = inst, teacher = teacher)
+				new_student = Student(email=email, name=name, phone_number = phone_no, institution = inst) 
 				new_student.save()
 				user.save()
 				return Response("Saved student successfully!!", status=status.HTTP_201_CREATED)

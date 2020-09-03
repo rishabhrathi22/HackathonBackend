@@ -7,7 +7,6 @@ class Classroom(models.Model):
 	standard = models.IntegerField()
 	section = models.CharField(max_length=10)
 	subject = models.CharField(max_length = 200)
-	
 
 	def __str__(self):
 		return str(self.standard) + " - " + self.section + " - " + self.subject
