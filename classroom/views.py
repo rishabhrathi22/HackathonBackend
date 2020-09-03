@@ -159,23 +159,26 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
 
     def viewstudents(self, request, classid):
-        clas = Classroom.objects.all().filter(id = classid)
-        students = Studentlist.objects.filter(classroom = clas).all()
-        stud_lst = []
-        
-        for student in students:
+        try:
+            clas = Classroom.objects.all().filter(id = classid).first()
+            students = Studentlist.objects.filter(classroom = clas).all()
+            stud_lst = []
             
-            dictonary = {
-                "student_id" : student.student.id,
-                "student_name": student.student.name,
-                "student_email": student.student.email,
-                "student_phone_no" : student.student.phone_number,
-                # "student_teacher" : student.student.teacher.name,
-                # "student_teacher_email" : student.student.teacher.email,
-            }
-            stud_lst.append(dictonary)
-        
-        return Response(stud_lst, status=status.HTTP_200_OK)
+            for student in students:
+                
+                dictonary = {
+                    "student_id" : student.student.id,
+                    "student_name": student.student.name,
+                    "student_email": student.student.email,
+                    "student_phone_no" : student.student.phone_number,
+                    # "student_teacher" : student.student.teacher.name,
+                    # "student_teacher_email" : student.student.teacher.email,
+                }
+                stud_lst.append(dictonary)
+            
+            return Response(stud_lst, status=status.HTTP_200_OK)
+        except:
+            return Response("Error", status.HTTP_404_NOT_FOUND)    
 
 
     def createassign(self, request):
