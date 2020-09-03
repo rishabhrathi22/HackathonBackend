@@ -43,7 +43,7 @@ class Attendance(models.Model):
 	date = models.DateTimeField(default=datetime.now)
 	classroom = models.ForeignKey(Classroom, on_delete = models.CASCADE)
 	student = models.ForeignKey(Student, on_delete = models.CASCADE)
-	attendance_status = models.BooleanField() 
+	# attendance_status = models.BooleanField()
 
 	def __str__(self): 
 		return self.student.name + '-' + self.attendance_status

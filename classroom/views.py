@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import action
+import datetime
 
 from .serializers import ClassroomSerializer, CreateClassroomSerializer, AddStudentSerializer, ViewStudentSerializer, NewAssignmentSerializer, ViewAssignmentSerializer, AddMarksSerializer, MarkAttendanceSerializer
 
@@ -269,6 +270,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
         return Response(marklist, status=status.HTTP_200_OK)
 
+
     def markattendance(self, request):
         # if request.user.is_authenticated:
         student_id = request.data["student_id"]
@@ -278,7 +280,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         student = Student.objects.filter(id = student_id).first()
         classroom = Classroom.objects.filter(id = classroom_id).first()
 
-        studattendance = Attendance(student=student, classroom = classroom, attendance = attendance)
+        studattendance = Attendance(student=student, classroom = classroom, attendance_status = attendance)
         studattendance.save()
         return Response("attendance saved!!", status=status.HTTP_200_OK)
         # else:
@@ -291,11 +293,10 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
         for attendance in attendance_list:
             dictonary = {
-                    "attendance_id" : attendance.id,
-                    "attendance_status" : attendance.attendance_status,
-                    "name" : attendance.student.name,
-                    "date" : attendance.date,
-                    
+                "attendance_id" : attendance.id,
+                "attendance_status" : attendance.attendance_status,
+                "name" : attendance.student.name,
+                "date" : attendance.date,      
             }
             attendancelist.append(dictonary)
 

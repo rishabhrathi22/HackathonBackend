@@ -29,7 +29,7 @@ urlpatterns = [
 	path('addstudent/', class_addstudent),
 	path('viewstudents/<int:classid>/', class_viewstudents),
 
-	path('viewclass/<str:standard>/<str:section>/<str:subject>/', class_detail),
+	# path('viewclass/<str:standard>/<str:section>/<str:subject>/', class_detail),
 	path('viewclasses/teacher/<int:teacherid>/', teacherviewclass),
 	path('viewclasses/student/<int:studentid>/', studentviewclass),
 	
