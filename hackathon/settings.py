@@ -39,13 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'corsheaders',
     'institution',
     'teacher',
     'student',
     'classroom',
-    'rest_framework',
     'users',
+    'corsheaders',
+    'rest_framework',
     'drf_yasg',
 ]
 

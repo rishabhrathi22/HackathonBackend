@@ -29,8 +29,8 @@ class TeacherChangePasswordSerializer(serializers.Serializer):
 	password = serializers.CharField(max_length=200)
 	newpass = serializers.CharField(max_length=200)
 
-class StundentListSerializer(serializers.Serializer):
-	email = serializers.EmailField()
-	standard = serializers.IntegerField()
-	section = serializers.CharField(max_length=10)
-	subject = serializers.CharField(max_length = 200)
+# class StundentListSerializer(serializers.Serializer):
+# 	email = serializers.EmailField()
+# 	standard = serializers.IntegerField()
+# 	section = serializers.CharField(max_length=10)
+# 	subject = serializers.CharField(max_length = 200)

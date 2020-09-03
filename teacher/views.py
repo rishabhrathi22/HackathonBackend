@@ -6,11 +6,11 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import action
 
-from .serializers import TeacherSerializer, TeacherViewSerializer, TeacherSignupSerializer, TeacherLoginSerializer, TeacherChangePasswordSerializer, StundentListSerializer
+from .serializers import TeacherSerializer, TeacherViewSerializer, TeacherSignupSerializer, TeacherLoginSerializer, TeacherChangePasswordSerializer
 from institution.serializers import EmailSerializer
 from student.serializers import StudentSerializer
 
-from .models import Teacher, StudentTeacherClassMapping
+from .models import Teacher
 from institution.models import Institute
 from student.models import Student
 
@@ -29,7 +29,6 @@ class TeacherViewSet(viewsets.GenericViewSet):
 
 	serializer_classes = {
 		'retrieve': EmailSerializer,
-		'getAllStudents': StundentListSerializer,
 		'approveStudent': EmailSerializer,
 		'login': TeacherLoginSerializer,
 		'change_password': TeacherChangePasswordSerializer,
@@ -42,40 +41,22 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		if request.user.is_authenticated:
 			email = request.data['email']
 			queryset = Teacher.objects.all().filter(email__iexact = email)
-			if queryset is not None:
-				serializer = TeacherSerializer(queryset, many=True)
-				return Response(serializer.data, status=status.HTTP_200_OK)
-			else:
+
+			if queryset is None:
 				return Response("Does not Exist.", status = status.HTTP_404_NOT_FOUND)
-		else:
-			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)	
 
-	def getAllStudents(self, request):
-		if request.user.is_authenticated:
-			serializer = StundentListSerializer(request.data)
-			if serializer.is_valid:
-				email = request.data['email']
-				standard = request.data['standard'] 
-				section = request.data['section']
-				subject = request.data['subject']
-				
-				queryset = StudentTeacherClassMapping.objects.all().filter(teacher_email__iexact = email).filter(standard = standard).filter(section__iexact = section).filter(subject__iexact = subject)
+			teacher = {
+				"name": queryset[0].name,
+				"email": queryset[0].email,
+				"phone_number": queryset[0].phone_number,
+				"institution_email": queryset[0].institution.email,
+				"status": queryset[0].status
+			}
 
-				if queryset is not None:
-					student_emails = [item.student_email for item in queryset]
-					queryset = []
+			return Response(teacher, status = status.HTTP_200_OK)				
+		
+		return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
-					for email in student_emails:
-						queryset.append(Student.objects.get(email__iexact = email))
-
-					serializer = StudentSerializer(queryset, many = True)
-					return Response(serializer.data, status=status.HTTP_200_OK)
-				else:
-					return Response("Does not Exist.", status = status.HTTP_404_NOT_FOUND)	
-			else:
-				return Response(serializer.error, status = status.HTTP_401_UNAUTHORIZED)		
-		else:
-			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
 	def create(self, request):
 		ser_data = TeacherSignupSerializer(data = request.data)
@@ -89,7 +70,7 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		if ser_data.is_valid():
 			try:
 				inst = Institute.objects.filter(email__iexact = inst_email).first()
-				new_teacher = Teacher(email=email, name=name, phone_number = phone_number, institution = inst, institution_email = inst_email) 
+				new_teacher = Teacher(email=email, name=name, phone_number = phone_number, institution = inst) 
 				new_teacher.save()
 				user.save()
 				return Response("Saved teacher successfully!!", status=status.HTTP_201_CREATED)
@@ -147,11 +128,38 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		if request.user.is_authenticated:
 			stud = request.data['email']
 			try:
-				s = Student.objects.get(email__iexact = stud)
+				s = Student.objects.filter().filter(email__iexact = stud)
 				s.status = 1
 				s.save()
 				return Response("Student approved successfully.", status=status.HTTP_200_OK)
 			except:
 				return Response("Invalid student mail.", status=status.HTTP_401_UNAUTHORIZED)
 		else:
-			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)			
+			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
+
+	# def getAllStudents(self, request):
+	# 	if request.user.is_authenticated:
+	# 		serializer = StundentListSerializer(request.data)
+	# 		if serializer.is_valid:
+	# 			email = request.data['email']
+	# 			standard = request.data['standard'] 
+	# 			section = request.data['section']
+	# 			subject = request.data['subject']
+				
+	# 			queryset = StudentTeacherClassMapping.objects.all().filter(teacher_email__iexact = email).filter(standard = standard).filter(section__iexact = section).filter(subject__iexact = subject)
+
+	# 			if queryset is not None:
+	# 				student_emails = [item.student_email for item in queryset]
+	# 				queryset = []
+
+	# 				for email in student_emails:
+	# 					queryset.append(Student.objects.get(email__iexact = email))
+
+	# 				serializer = StudentSerializer(queryset, many = True)
+	# 				return Response(serializer.data, status=status.HTTP_200_OK)
+	# 			else:
+	# 				return Response("Does not Exist.", status = status.HTTP_404_NOT_FOUND)	
+	# 		else:
+	# 			return Response(serializer.error, status = status.HTTP_401_UNAUTHORIZED)		
+	# 	else:
+	# 		return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)		
