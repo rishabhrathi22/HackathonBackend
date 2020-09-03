@@ -169,8 +169,8 @@ class ClassroomViewSet(viewsets.GenericViewSet):
                 "student_name": student.student.name,
                 "student_email": student.student.email,
                 "student_phone_no" : student.student.phone_number,
-                "student_teacher" : student.student.teacher.name,
-                "student_teacher_email" : student.student.teacher.email,
+                # "student_teacher" : student.student.teacher.name,
+                # "student_teacher_email" : student.student.teacher.email,
             }
             stud_lst.append(dictonary)
         
