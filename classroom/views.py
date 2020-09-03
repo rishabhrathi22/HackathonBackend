@@ -77,7 +77,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
             return Response("Bad Request!!", status=status.HTTP_401_UNAUTHORIZED)
 
 
-    def retrieve(self, request, standard,section,subject):
+    def retrieve(self, request, standard, section, subject):
         try:
             classroom = Classroom.objects.filter(standard=int(standard)).filter(section=section).filter(subject=subject).first()
             serializer = ClassroomSerializer(classroom)
@@ -159,9 +159,10 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
 
     def viewstudents(self, request, classid):
-        
-        students = Studentlist.objects.filter(id = classid).all()
+        clas = Classroom.objects.all().filter(id = classid)
+        students = Studentlist.objects.filter(classroom = clas).all()
         stud_lst = []
+        
         for student in students:
             
             dictonary = {
