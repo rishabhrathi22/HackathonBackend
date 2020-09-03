@@ -134,28 +134,28 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
       
     def addstudent(self, request):
-        if request.user.is_authenticated:
-            ser_data = AddStudentSerializer(data=request.data)
-            class_id = request.data["classroom_id"]
-            teacher_email = request.data["teacher_email"]
-            student_email = request.data["student_email"]
+        # if request.user.is_authenticated:
+        ser_data = AddStudentSerializer(data=request.data)
+        class_id = request.data["classroom_id"]
+        teacher_email = request.data["teacher_email"]
+        student_email = request.data["student_email"]
 
-            teacher = Teacher.objects.filter(email = teacher_email, status=True).first()
-            classroom = Classroom.objects.filter(id = class_id).first()
-            student = Student.objects.filter(email = student_email, status=True).first()
+        teacher = Teacher.objects.filter(email = teacher_email, status=True).first()
+        classroom = Classroom.objects.filter(id = class_id).first()
+        student = Student.objects.filter(email = student_email, status=True).first()
 
-            if teacher is None or student is None: 
-                return Response("Student or teacher is not verified!!", status=status.HTTP_401_UNAUTHORIZED)
+        if teacher is None or student is None: 
+            return Response("Student or teacher is not verified!!", status=status.HTTP_401_UNAUTHORIZED)
 
-            if Studentlist.objects.filter(classroom = classroom, student=student).first() is not None:
-                return Response("Student Already Exist!!", status=status.HTTP_401_UNAUTHORIZED)
-            
-            addstudent = Studentlist(classroom=classroom, student=student)
-            addstudent.save()
-            return Response("Succesfully Added Student!!", status=status.HTTP_200_OK)
+        if Studentlist.objects.filter(classroom = classroom, student=student).first() is not None:
+            return Response("Student Already Exist!!", status=status.HTTP_401_UNAUTHORIZED)
         
-        else:
-            return Response("Teacher is not logged in!!", status=status.HTTP_401_UNAUTHORIZED)
+        addstudent = Studentlist(classroom=classroom, student=student)
+        addstudent.save()
+        return Response("Succesfully Added Student!!", status=status.HTTP_200_OK)
+        
+        # else:
+            # return Response("Teacher is not logged in!!", status=status.HTTP_401_UNAUTHORIZED)
 
 
     def viewstudents(self, request, classid):
@@ -178,23 +178,23 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
 
     def createassign(self, request):
-        if request.user.is_authenticated:
-            ser_data = NewAssignmentSerializer(data=request.data)
-            teacher_email = request.data["teacher_email"]
-            class_id = request.data["classroom_id"]
-            link = request.data["assign_url"]
+        # if request.user.is_authenticated:
+        ser_data = NewAssignmentSerializer(data=request.data)
+        teacher_email = request.data["teacher_email"]
+        class_id = request.data["classroom_id"]
+        link = request.data["assign_url"]
 
-            classroom = Classroom.objects.filter(id = class_id).first()
-            teacher = Teacher.objects.filter(email = teacher_email, status=True).first()
-            if teacher is None or classroom is None: 
-                return Response("Bad Request!!", status=status.HTTP_401_UNAUTHORIZED)
-            
-            newassign = Assignment(classroom=classroom, assign_url = link)
-            newassign.save()
-            return Response("new assign created!!", status=status.HTTP_200_OK)
+        classroom = Classroom.objects.filter(id = class_id).first()
+        teacher = Teacher.objects.filter(email = teacher_email, status=True).first()
+        if teacher is None or classroom is None: 
+            return Response("Bad Request!!", status=status.HTTP_401_UNAUTHORIZED)
+        
+        newassign = Assignment(classroom=classroom, assign_url = link)
+        newassign.save()
+        return Response("new assign created!!", status=status.HTTP_200_OK)
     
-        else:
-            return Response("Teacher is not logged in!!", status=status.HTTP_401_UNAUTHORIZED)
+        # else:
+            # return Response("Teacher is not logged in!!", status=status.HTTP_401_UNAUTHORIZED)
 
     def viewassignments(self, request, classid):
         assign = Assignment.objects.filter(classroom = Classroom.objects.filter(id=classid).first())
@@ -204,26 +204,26 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
 
     def addmarks(self, request):
-        if request.user.is_authenticated:
-            assignment_id = request.data["assignment_id"]
-            student_id = request.data["student_id"]
-            marksobtain = request.data["marksobtain"]
-            totalmarks =  request.data["totalmarks"]
+        # if request.user.is_authenticated:
+        assignment_id = request.data["assignment_id"]
+        student_id = request.data["student_id"]
+        marksobtain = request.data["marksobtain"]
+        totalmarks =  request.data["totalmarks"]
 
-            assignment = Assignment.objects.filter(id = assignment_id).first()
-            student = Student.objects.filter(id = student_id).first()
-            studmarks = Marks.objects.filter(assignment=assignment, student=student).first()
-            if studmarks is not None:
-                studmarks.marks_obtain = marksobtain
-                studmarks.totalmarks = totalmarks
-                studmarks.save()
-                return Response("marks updated!!", status=status.HTTP_200_OK)
-            else:
-                studmarks = Marks(assignment=assignment, student=student, marks_obtain=marksobtain, total_marks=totalmarks)
-                studmarks.save()
-                return Response("marks saved!!", status=status.HTTP_200_OK)
+        assignment = Assignment.objects.filter(id = assignment_id).first()
+        student = Student.objects.filter(id = student_id).first()
+        studmarks = Marks.objects.filter(assignment=assignment, student=student).first()
+        if studmarks is not None:
+            studmarks.marks_obtain = marksobtain
+            studmarks.totalmarks = totalmarks
+            studmarks.save()
+            return Response("marks updated!!", status=status.HTTP_200_OK)
         else:
-            return Response("Teacher is not logged in!!", status=status.HTTP_401_UNAUTHORIZED)
+            studmarks = Marks(assignment=assignment, student=student, marks_obtain=marksobtain, total_marks=totalmarks)
+            studmarks.save()
+            return Response("marks saved!!", status=status.HTTP_200_OK)
+        # else:
+            # return Response("Teacher is not logged in!!", status=status.HTTP_401_UNAUTHORIZED)
 
     def viewbystudent(self, request, studentid):
         student = Student.objects.filter(id = studentid).first()
@@ -266,26 +266,23 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         return Response(marklist, status=status.HTTP_200_OK)
 
     def markattendance(self, request):
-        if request.user.is_authenticated:
-            student_id = request.data["student_id"]
-            classroom_id = request.data["classroom_id"]
-            attendance = request.data["attendance"]
-            
-            
-            student = Student.objects.filter(id = student_id).first()
-            classroom = Classroom.objects.filter(id = classroom_id).first()
+        # if request.user.is_authenticated:
+        student_id = request.data["student_id"]
+        classroom_id = request.data["classroom_id"]
+        attendance = request.data["attendance"]
+        
+        student = Student.objects.filter(id = student_id).first()
+        classroom = Classroom.objects.filter(id = classroom_id).first()
 
-            studattendance = Attendance(student=student, classroom = classroom, attendance = attendance)
-            studattendance.save()
-            return Response("attendance saved!!", status=status.HTTP_200_OK)
-        else:
-            return Response("Teacher is not logged in!!", status=status.HTTP_401_UNAUTHORIZED)
+        studattendance = Attendance(student=student, classroom = classroom, attendance = attendance)
+        studattendance.save()
+        return Response("attendance saved!!", status=status.HTTP_200_OK)
+        # else:
+            # return Response("Teacher is not logged in!!", status=status.HTTP_401_UNAUTHORIZED)
 
     def viewattendance(self,request, classroomid):
         classroom = Classroom.objects.filter(id = classroomid).first()
-
         attendance_list = Attendance.objects.filter(classroom=classroom).all()
-
         attendancelist = []
 
         for attendance in attendance_list:

@@ -43,6 +43,4 @@ urlpatterns = [
 	path('markattendance/', class_markattendance),
 	path('viewattendance/<int:classroomid>', class_markattendance),
 	
-
-	
 ]
