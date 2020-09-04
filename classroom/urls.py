@@ -3,15 +3,14 @@ from rest_framework import routers
 
 from . import views
 
-class_view = views.ClassroomViewSet.as_view({'get':'list'})
+class_view = views.ClassroomViewSet.as_view({'post':'list'})
 class_create = views.ClassroomViewSet.as_view({'post':'create'})
-class_detail = views.ClassroomViewSet.as_view({'get': 'retrieve'})
 
-studentviewclass = views.ClassroomViewSet.as_view({'get': 'forstudent'})
-teacherviewclass = views.ClassroomViewSet.as_view({'get': 'forteacher'})
+# studentviewclass = views.ClassroomViewSet.as_view({'get': 'forstudent'})
+# teacherviewclass = views.ClassroomViewSet.as_view({'get': 'forteacher'})
 
 class_addstudent = views.ClassroomViewSet.as_view({'post': 'addstudent'})
-class_viewstudents = views.ClassroomViewSet.as_view({'get':'viewstudents'})
+class_viewstudents = views.ClassroomViewSet.as_view({'post':'viewstudents'})
 
 class_createassign = views.ClassroomViewSet.as_view({'post':'createassign'})
 class_viewassignments = views.ClassroomViewSet.as_view({'get':'viewassignments'})
@@ -29,9 +28,8 @@ urlpatterns = [
 	path('addstudent/', class_addstudent),
 	path('viewstudents/<int:classid>/', class_viewstudents),
 
-	# path('viewclass/<str:standard>/<str:section>/<str:subject>/', class_detail),
-	path('viewclasses/teacher/<int:teacherid>/', teacherviewclass),
-	path('viewclasses/student/<int:studentid>/', studentviewclass),
+	# path('viewclasses/teacher/<int:teacherid>/', teacherviewclass),
+	# path('viewclasses/student/<int:studentid>/', studentviewclass),
 	
 	path('create-new-assign/', class_createassign),
 	path('viewassignments/<int:classid>/', class_viewassignments),
@@ -41,6 +39,6 @@ urlpatterns = [
 	path('viewmarks/classroomid/<int:classroomid>/', class_viewmarks_classroom),
 
 	path('markattendance/', class_markattendance),
-	path('viewattendance/<int:classroomid>', class_markattendance),
+	path('viewattendance/<int:classroomid>', class_viewattendance),
 	
 ]

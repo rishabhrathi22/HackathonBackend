@@ -3,7 +3,6 @@ from institution.models import Institute
 
 class Teacher(models.Model):
 	institution = models.ForeignKey(Institute, on_delete=models.CASCADE, default=None)
-	# institution_email = models.EmailField()
 	email = models.EmailField(unique = True)
 	name = models.CharField(max_length=200)
 	phone_number = models.CharField(max_length=10)

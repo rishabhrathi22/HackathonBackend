@@ -7,7 +7,7 @@ from . import views
 inst_detail = views.InstituteViewSet.as_view({'post': 'retrieve'})
 inst_create = views.InstituteViewSet.as_view({'post':'create'})
 inst_login = views.InstituteViewSet.as_view({'post':'login'})
-inst_logout = views.InstituteViewSet.as_view({'get':'logout'})
+inst_logout = views.InstituteViewSet.as_view({'post':'logout'})
 inst_change_pwd = views.InstituteViewSet.as_view({'post':'change_password'})
 inst_approve_teacher = views.InstituteViewSet.as_view({'post':'approveTeacher'})
 inst_get_all_teachers = views.InstituteViewSet.as_view({'post': 'getAllTeachers'})

@@ -26,7 +26,10 @@ class Assignment(models.Model):
 	title = models.CharField(max_length = 200)
 	classroom = models.ForeignKey(Classroom, on_delete = models.CASCADE)
 	date = models.DateTimeField(default=datetime.now)
-	assign_url = models.URLField(default=None)
+	assign_url = models.URLField(blank = True)
+
+	def __str__(self):
+		return self.title
 
 
 class Marks(models.Model):
@@ -40,10 +43,14 @@ class Marks(models.Model):
 
 
 class Attendance(models.Model):
-	date = models.DateTimeField(default=datetime.now)
+	d = datetime.now()
+	date = models.CharField(default=d.strftime("%d-%m-%Y"), max_length=10)
 	classroom = models.ForeignKey(Classroom, on_delete = models.CASCADE)
 	student = models.ForeignKey(Student, on_delete = models.CASCADE)
-	# attendance_status = models.BooleanField()
+	attendance_status = models.BooleanField()
+
+	class Meta:
+		unique_together = (('classroom', 'student', 'date'),)
 
 	def __str__(self): 
-		return self.student.name + '-' + self.attendance_status
+		return self.student.name + '-' + str(self.attendance_status)

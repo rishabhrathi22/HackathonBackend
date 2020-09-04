@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
+from password_generator import PasswordGenerator
 
 
 class CustomUserManager(BaseUserManager):
@@ -13,9 +14,11 @@ class CustomUserManager(BaseUserManager):
         """
         if not email:
             raise ValueError(_('The Email must be set'))
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        
+        email = self.normalize_email(email).lower()
+        pwo = PasswordGenerator()
+        key = pwo.generate()
+
+        user = self.model(email=email, key=key, **extra_fields)
         user.set_password(password)
         try:
             # user.save()

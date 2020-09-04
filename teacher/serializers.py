@@ -8,10 +8,10 @@ class TeacherSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 class TeacherViewSerializer(serializers.ModelSerializer):
-	institution_email = serializers.EmailField()
+	# institution_email = serializers.EmailField()
 	class Meta:
 		model = Teacher
-		fields = ('email', 'name', 'phone_number', 'status', 'institution_email')
+		fields = ('email', 'name', 'phone_number', 'status')
 
 class TeacherSignupSerializer(serializers.Serializer):
 	institution_email = serializers.EmailField()

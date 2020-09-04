@@ -26,3 +26,4 @@ class InstituteChangePasswordSerializer(serializers.Serializer):
 
 class EmailSerializer(serializers.Serializer):
 	email = serializers.EmailField()
+	key = serializers.CharField(max_length = 200)

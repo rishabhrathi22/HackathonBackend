@@ -3,17 +3,16 @@ from rest_framework import routers
 
 from . import views
 
-student_view = views.StudentViewSet.as_view({'get':'list'})
 student_create = views.StudentViewSet.as_view({'post':'create'})
 student_login = views.StudentViewSet.as_view({'post':'login'})
-student_logout = views.StudentViewSet.as_view({'get':'logout'})
-student_detail = views.StudentViewSet.as_view({'get': 'retrieve'})
+student_logout = views.StudentViewSet.as_view({'post':'logout'})
+student_detail = views.StudentViewSet.as_view({'post': 'retrieve'})
 student_change_pwd = views.StudentViewSet.as_view({'post':'change_password'})
 
 
 urlpatterns = [
 	
-	path('', student_view),
+	path('', student_detail),
 	path('register/', student_create),
 	path('login/', student_login),
 	path('logout/', student_logout),
