@@ -272,12 +272,13 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         marklist=[]
         for mark in marks:
             dictonary = {
-                "marks_id" : mark.id,
-                "assignment_id" : mark.assignment.id,
+                # "marks_id" : mark.id,
+                # "assignment_id" : mark.assignment.id,
                 "assignment_date" : mark.assignment.date,
                 "mark_obtain" : mark.marks_obtain,
                 "total_marks" : mark.total_marks,
-                "classroom_id": mark.assignment.classroom.id
+                "assignment_title": mark.assignment.title,
+                # "classroom_id": mark.assignment.classroom.id
             }
             marklist.append(dictonary)
 
