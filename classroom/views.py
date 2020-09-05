@@ -300,7 +300,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
                     "mark_obtain" : mark.marks_obtain,
                     "total_marks" : mark.total_marks,
                     "student_name": mark.student.name,
-                    "assignment_title": mark.assignment_id.title
+                    "assignment_title": mark.assignment.title
                     # "classroom_id": mark.assignment.classroom.id
                 }
                 marklist.append(dictonary)
