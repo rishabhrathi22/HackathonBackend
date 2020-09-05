@@ -75,7 +75,7 @@ class StudentViewSet(viewsets.GenericViewSet):
 				print(e)
 				return Response(e, status=status.HTTP_401_UNAUTHORIZED)
 		
-		return Response(ser_data.errors, status=status.HTTP_401_UNAUTHORIZED)
+		return Response("Error", status=status.HTTP_401_UNAUTHORIZED)
 
 
 	def login(self, request):
