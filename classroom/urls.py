@@ -21,6 +21,7 @@ class_viewmarks_classroom = views.ClassroomViewSet.as_view({'get': 'viewbyclassr
 
 class_markattendance =  views.ClassroomViewSet.as_view({'post':'markattendance'})
 class_viewattendance = views.ClassroomViewSet.as_view({'get':'viewattendance'})
+class_viewstudentattendance = views.ClassroomViewSet.as_view({'get':'viewstudentattendance'})
 
 urlpatterns = [
 	path('', class_view),
@@ -39,6 +40,7 @@ urlpatterns = [
 	path('viewmarks/classroomid/<int:classroomid>/', class_viewmarks_classroom),
 
 	path('markattendance/', class_markattendance),
+	path('viewattendance/<int:classroomid>/<int:studentid>/', class_viewstudentattendance),
 	path('viewattendance/<int:classroomid>', class_viewattendance),
 	
 ]

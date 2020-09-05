@@ -313,8 +313,8 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         if self.getKey(teacher_email)!=key:
             return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
-        lis = request.data['list']
-
+        lis = list(request.data['list'])
+        
         for item in lis:
 
             student_id = item["student_id"]
@@ -338,6 +338,23 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         attendance_list = Attendance.objects.filter(classroom=classroom).all()
         attendancelist = []
 
+        for attendance in attendance_list:
+            dictonary = {
+                "attendance_id" : attendance.id,
+                "attendance_status" : attendance.attendance_status,
+                "name" : attendance.student.name,
+                "date" : attendance.date,      
+            }
+            attendancelist.append(dictonary)
+
+        return Response(attendancelist, status=status.HTTP_200_OK)
+
+    def viewstudentattendance(self, request, classroomid, studentid):
+        classroom = Classroom.objects.filter(id = classroomid).first()
+        student = Student.objects.filter(id = studentid).first()
+        attendance_list = Attendance.objects.filter(classroom=classroom, student=student).all()
+        attendancelist = []
+        
         for attendance in attendance_list:
             dictonary = {
                 "attendance_id" : attendance.id,
