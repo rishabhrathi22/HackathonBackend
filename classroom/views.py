@@ -339,9 +339,14 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         attendancelist = []
 
         for attendance in attendance_list:
+            if attendance.attendance_status == True:
+                status = "Present"
+            else:
+                status = "Absent"  
+
             dictonary = {
                 "attendance_id" : attendance.id,
-                "attendance_status" : attendance.attendance_status,
+                "attendance_status" : status,
                 "name" : attendance.student.name,
                 "date" : attendance.date,      
             }
@@ -356,9 +361,14 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         attendancelist = []
         
         for attendance in attendance_list:
+            if attendance.attendance_status == True:
+                status = "Present"
+            else:
+                status = "Absent"    
+            
             dictonary = {
                 "attendance_id" : attendance.id,
-                "attendance_status" : attendance.attendance_status,
+                "attendance_status" : status,
                 "name" : attendance.student.name,
                 "date" : attendance.date,      
             }
