@@ -166,7 +166,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
         teacher = Teacher.objects.filter(email = teacher_email, status=True).first()
         classroom = Classroom.objects.filter(id = class_id).first()
-        student = Student.objects.filter(email = student_email, status=True).first()
+        student = Student.objects.filter(email = student_email).first()
 
         if teacher is None or student is None:
             return Response("Student or teacher is not verified!!", status=status.HTTP_401_UNAUTHORIZED)
@@ -176,6 +176,8 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         
         addstudent = Studentlist(classroom=classroom, student=student)
         addstudent.save()
+        student.status = True
+        student.save()
         return Response("Succesfully Added Student!!", status=status.HTTP_200_OK)
 
 
