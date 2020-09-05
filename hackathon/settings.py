@@ -63,7 +63,7 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',
+    'http://localhost:3000', 'https://learnzilla-student.netlify.app'
 )
 
 ROOT_URLCONF = 'hackathon.urls'

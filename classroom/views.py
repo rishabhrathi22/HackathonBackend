@@ -262,7 +262,6 @@ class ClassroomViewSet(viewsets.GenericViewSet):
             else:
                 studmarks = Marks(assignment=assignment, student=student, marks_obtain=marksobtain, total_marks=totalmarks)
                 studmarks.save()
-                # return Response("Marks saved!!", status=status.HTTP_200_OK)
 
         return Response("Marks updated!!", status=status.HTTP_200_OK)
 
@@ -344,7 +343,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
             if attendance.attendance_status == True:
                 stustatus = "Present"
             else:
-                stustatus = "Absent"  
+                stustatus = "Absent"
 
             dictonary = {
                 "attendance_id" : attendance.id,
