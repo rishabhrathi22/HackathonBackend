@@ -8,3 +8,4 @@ class AdminSignupSerializer(serializers.Serializer):
 class UserSerializer(serializers.Serializer):
 	email = serializers.EmailField()
 	key = serializers.CharField(max_length=200)
+	hackathon = serializers.CharField(max_length=15, default = "LetsUpgrade")
