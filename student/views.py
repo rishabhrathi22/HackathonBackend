@@ -85,7 +85,9 @@ class StudentViewSet(viewsets.GenericViewSet):
 			user = verifyUser(request.data['email'], request.data['password'])
 			if user is not False:
 				login(request, user)
-				return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+				d = UserSerializer(user).data
+				d["Hackathon"] = "LetsUpgrade"
+				return Response(d, status=status.HTTP_200_OK)
 			else:
 				return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)	
 
