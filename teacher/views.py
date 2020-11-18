@@ -90,13 +90,15 @@ class TeacherViewSet(viewsets.GenericViewSet):
 
 	def login(self, request):
 		teacher = TeacherLoginSerializer(data = request.data)
+		print('Received Data:', request.data)
 
 		if Teacher.objects.filter(email__iexact = request.data['email']).exists():
 			user = verifyUser(request.data['email'], request.data['password'])
+			print('User:', user)
+			
 			if user is not False:
 				login(request, user)
 				d = UserSerializer(user).data
-				d["Hackathon"] = "LetsUpgrade"
 				return Response(d, status=status.HTTP_200_OK)
 			else:
 				return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)	
