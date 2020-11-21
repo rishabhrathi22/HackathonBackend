@@ -76,13 +76,14 @@ class TeacherViewSet(viewsets.GenericViewSet):
 
 		if ser_data.is_valid():
 			try:
-				inst = Institute.objects.filter(email__iexact = inst_email).first()
+				inst = Institute.objects.all().first()
+				print(inst)
 				new_teacher = Teacher(email=email, name=name, phone_number = phone_number, institution = inst) 
 				new_teacher.save()
 				user.save()
 				return Response("Saved teacher successfully!!", status=status.HTTP_201_CREATED)
 			except Exception as e:
-				print(e)
+				print('Error is ', e)
 				return Response("Some error occurred", status=status.HTTP_401_UNAUTHORIZED)
 		
 		return Response("Error", status=status.HTTP_401_UNAUTHORIZED)

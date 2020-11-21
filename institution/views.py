@@ -74,7 +74,7 @@ class InstituteViewSet(viewsets.GenericViewSet):
 		inst = InstituteSerializer(data = request.data)
 		email = request.data['email']
 		pwd = request.data['password']
-		user = CustomUser.objects.create_user(email, pwd)
+		user = CustomUser.objects.create_user(email.lower(), pwd)
 
 		if inst.is_valid():
 			try:
@@ -92,12 +92,15 @@ class InstituteViewSet(viewsets.GenericViewSet):
 		inst = InstituteLoginSerializer(data = request.data)
 
 		if Institute.objects.filter(email__iexact = request.data['email']).exists():
-			user = verifyUser(request.data['email'].lower(), request.data['password'])
-			if user is not False:
-				login(request, user)
-				return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+			if Institute.objects.get(email__iexact = request.data['email']).status == True:
+				user = verifyUser(request.data['email'].lower(), request.data['password'])
+				if user is not False:
+					login(request, user)
+					return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+				else:
+					return Response("Error.", status=status.HTTP_401_UNAUTHORIZED)	
 			else:
-				return Response("Error.", status=status.HTTP_401_UNAUTHORIZED)	
+				return Response("You are not yet approved.", status = status.HTTP_401_UNAUTHORIZED)		
 
 		return Response("Invalid institution mail.", status=status.HTTP_401_UNAUTHORIZED)
 
