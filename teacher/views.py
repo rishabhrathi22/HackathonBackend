@@ -83,7 +83,7 @@ class TeacherViewSet(viewsets.GenericViewSet):
 				return Response("Saved teacher successfully!!", status=status.HTTP_201_CREATED)
 			except Exception as e:
 				print(e)
-				return Response(e, status=status.HTTP_401_UNAUTHORIZED)
+				return Response("Some error occurred", status=status.HTTP_401_UNAUTHORIZED)
 		
 		return Response("Error", status=status.HTTP_401_UNAUTHORIZED)
 
