@@ -41,6 +41,7 @@ class ChatViewSet(viewsets.GenericViewSet):
                 chatt = json.loads(chatid.conversation)
                 chatt.append(['student', chat])
                 chatid.conversation = json.dumps(chatt)
+                chatid.last_msg = 'student'
                 chatid.save() 
 
             
@@ -60,6 +61,7 @@ class ChatViewSet(viewsets.GenericViewSet):
             chatid = Chat.objects.filter(id=idd).first()
             chatt = json.loads(chatid.conversation)
             chatt.append(['teacher', chat])
+            chatid.last_msg = 'teacher'
             chatid.conversation = json.dumps(chatt)
             chatid.save() 
             return Response('succesfully send', status = status.HTTP_200_OK)
