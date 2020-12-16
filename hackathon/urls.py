@@ -29,6 +29,7 @@ urlpatterns = [
 	path('teacher/', include('teacher.urls')),
 	path('student/', include('student.urls')),
 	path('classroom/', include('classroom.urls')),
+	path('chat/', include('chatapp.urls')),
 	path('superuser/', include('users.urls')),
 	path('admin/', admin.site.urls),
 ]

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'teacher',
     'student',
     'classroom',
+    'chatapp',
     'users',
     'corsheaders',
     'rest_framework',
