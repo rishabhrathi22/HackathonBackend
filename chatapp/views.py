@@ -25,39 +25,44 @@ class ChatViewSet(viewsets.GenericViewSet):
     def chatFunction(self, request):
         
         ser_data = ChatSerializer(data=request.data)
+        student_email = request.data['student_email']
+        classroom_id = request.data['classroom_id']
+        chat = request.data['chat']
 
-        if ser_data.is_valid():
+        try:
+            if ser_data.is_valid():
 
-            student_email = request.data['student_email']
-            classroom_id = request.data['classroom_id']
-            chat = request.data['chat']
-           
-            if len(Chat.objects.filter(student_email=student_email).filter(classroom_id=classroom_id))==0:
-                chatt = [['student', chat]]
-                newchat = Chat(student_email=student_email, classroom_id=int(classroom_id), conversation = json.dumps(chatt), last_msg='student')
-                newchat.save()
+                
+                if len(Chat.objects.filter(student_email=student_email).filter(classroom_id=classroom_id))==0:
+                    chatt = [['student', chat]]
+                    newchat = Chat(student_email=student_email, classroom_id=int(classroom_id), conversation = json.dumps(chatt), last_msg='student')
+                    newchat.save()
+                    return Response(json.dumps(chatt), status=status.HTTP_200_OK)
+                    
+
+                else:
+                    chatid = Chat.objects.filter(student_email=student_email, classroom_id=classroom_id).first()
+                    chatt = json.loads(chatid.conversation)
+                    chatt.append(['student', chat])
+                    chatid.conversation = json.dumps(chatt)
+                    chatid.last_msg = 'student'
+                    chatid.save() 
+                    return Response(json.dumps(chatt), status=status.HTTP_200_OK)
+
             else:
-                chatid = Chat.objects.filter(student_email=student_email, classroom_id=classroom_id).first()
-                chatt = json.loads(chatid.conversation)
-                chatt.append(['student', chat])
-                chatid.conversation = json.dumps(chatt)
-                chatid.last_msg = 'student'
-                chatid.save() 
-
+                if chat=='':
+                    chatid = Chat.objects.filter(student_email=student_email, classroom_id=classroom_id).first()
+                    return Response(chatid.conversation, status=status.HTTP_200_OK)
             
-            return Response('succesfully send', status = status.HTTP_200_OK)
-
-        
-        
-
-        return Response('Serializer is invalid', status = status.HTTP_401_UNAUTHORIZED)
+        except:
+            return Response('Serializer is invalid', status = status.HTTP_401_UNAUTHORIZED)
     
     def chatFunction1(self, request):
         ser_data = TeacherChatSerializer(data=request.data)
-        
+        idd = request.data['chatid']
+        chat = request.data['chat']
+
         if ser_data.is_valid():
-            idd = request.data['chatid']
-            chat = request.data['chat']
             chatid = Chat.objects.filter(id=idd).first()
             chatt = json.loads(chatid.conversation)
             chatt.append(['teacher', chat])
@@ -65,7 +70,11 @@ class ChatViewSet(viewsets.GenericViewSet):
             chatid.conversation = json.dumps(chatt)
             chatid.save() 
             return Response('succesfully send', status = status.HTTP_200_OK)
-        
+        else:
+            if chat=='':
+                chatid = Chat.objects.filter(id=idd).first()
+                return Response(chatid.conversation, status=status.HTTP_200_OK)
+            
         return Response('Serializer is invalid', status = status.HTTP_401_UNAUTHORIZED)
     
     def listofchat(self, request, classroom_id):
