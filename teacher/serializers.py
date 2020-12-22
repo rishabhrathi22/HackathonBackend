@@ -19,6 +19,7 @@ class TeacherSignupSerializer(serializers.Serializer):
 	name = serializers.CharField(max_length=200)
 	phone_number = serializers.CharField(max_length=15)
 	password = serializers.CharField(max_length=200)
+	img = serializers.CharField(max_length = 1000000000000000)
 
 class TeacherLoginSerializer(serializers.Serializer):
 	email = serializers.EmailField()

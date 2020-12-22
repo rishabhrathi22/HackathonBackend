@@ -7,13 +7,11 @@ class ClassroomSerializer(serializers.ModelSerializer):
         model=  Classroom
         fields = '__all__'
 
-
 class CreateClassroomSerializer(serializers.Serializer):
     teacher_email = serializers.EmailField()
     standard = serializers.IntegerField()
     section = serializers.CharField(max_length=10)
     subject = serializers.CharField(max_length=200)
-
 
 class ViewStudentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,19 +23,16 @@ class ViewAssignmentSerializer(serializers.ModelSerializer):
         model=  Assignment
         fields = '__all__'
 
-
 class NewAssignmentSerializer(serializers.Serializer):
     title = serializers.CharField(max_length = 200)
     teacher_email = serializers.EmailField()
     classroom_id = serializers.IntegerField()
     assign_url = serializers.URLField(default=None)
 
-
 class AddStudentSerializer(serializers.Serializer):
     teacher_email = serializers.EmailField()
     student_email = serializers.EmailField()
     classroom_id = serializers.IntegerField()
-
 
 class AddMarksSerializer(serializers.Serializer):
     assignment_id = serializers.IntegerField()
@@ -49,3 +44,8 @@ class MarkAttendanceSerializer(serializers.Serializer):
     student_id = serializers.IntegerField()
     classroom_id = serializers.IntegerField()
     attendance = serializers.BooleanField()
+
+class SendEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    key = serializers.CharField(max_length = 200)
+    message = serializers.CharField(max_length = 1000)

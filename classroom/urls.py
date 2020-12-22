@@ -23,18 +23,17 @@ class_markattendance =  views.ClassroomViewSet.as_view({'post':'markattendance'}
 class_viewattendance = views.ClassroomViewSet.as_view({'get':'viewattendance'})
 class_viewstudentattendance = views.ClassroomViewSet.as_view({'get':'viewstudentattendance'})
 
+class_sendmails = views.ClassroomViewSet.as_view({'post': 'sendmails'})
+
 urlpatterns = [
 	path('', class_view),
 	path('create/', class_create),
 	path('addstudent/', class_addstudent),
 	path('viewstudents/<int:classid>/', class_viewstudents),
 
-	# path('viewclasses/teacher/<int:teacherid>/', teacherviewclass),
-	# path('viewclasses/student/<int:studentid>/', studentviewclass),
-	
 	path('create-new-assign/', class_createassign),
 	path('viewassignments/<int:classid>/', class_viewassignments),
-	
+
 	path('addmarks/', class_addmarks),
 	path('viewmarks/studentid/<int:studentid>/', class_viewmarks_student),
 	path('viewmarks/classroomid/<int:classroomid>/', class_viewmarks_classroom),
@@ -42,5 +41,6 @@ urlpatterns = [
 	path('markattendance/', class_markattendance),
 	path('viewattendance/<int:classroomid>/<int:studentid>/', class_viewstudentattendance),
 	path('viewattendance/<int:classroomid>', class_viewattendance),
-	
+
+	path('sendmails/<int:classroomid>', class_sendmails),
 ]

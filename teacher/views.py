@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.core.files import File
 
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -15,6 +16,8 @@ from users.models import CustomUser
 from institution.models import Institute
 from student.models import Student
 
+import base64
+
 
 def verifyUser(uname, pwd):
 	user = authenticate(email = uname, password = pwd)
@@ -22,8 +25,8 @@ def verifyUser(uname, pwd):
 		return user
 	return False
 
-class TeacherViewSet(viewsets.GenericViewSet):  
-	  
+class TeacherViewSet(viewsets.GenericViewSet):
+
 	default_serializer_class = TeacherSignupSerializer
 	model = Teacher
 	queryset = Teacher.objects.all()
@@ -35,18 +38,18 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		'logout': EmailSerializer,
 		'change_password': TeacherChangePasswordSerializer,
 	}
- 
+
 	def get_serializer_class(self):
 		return self.serializer_classes.get(self.action, self.default_serializer_class)
 
 	def getKey(self, email):
 		user = CustomUser.objects.get(email=email)
-		return user.key	
+		return user.key
 
 	def retrieve(self, request):
 		email = request.data['email']
 		key = request.data['key']
-		
+
 		if self.getKey(email)!=key:
 			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
@@ -54,12 +57,16 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		if queryset is None:
 			return Response("Does not Exist.", status = status.HTTP_404_NOT_FOUND)
 
+		img_file = open('media/teacher-images/' + str(queryset[0].profileimg), "rb")
+		img_base64 = base64.b64encode(img_file.read())
+
 		teacher = {
 			"name": queryset[0].name,
 			"email": queryset[0].email,
 			"phone_number": queryset[0].phone_number,
 			"institution_email": queryset[0].institution.email,
-			"status": queryset[0].status
+			"status": queryset[0].status,
+			"profileimg": img_base64
 		}
 
 		return Response(teacher, status = status.HTTP_200_OK)
@@ -77,15 +84,18 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		if ser_data.is_valid():
 			try:
 				inst = Institute.objects.all().first()
-				print(inst)
-				new_teacher = Teacher(email=email, name=name, phone_number = phone_number, institution = inst) 
+				img = open('media/teacher-images/' + str(phone_number) + '.png', 'wb')
+				img.write(base64.b64decode(request.data['img']))
+				img.close()
+
+				new_teacher = Teacher(email=email, name=name, phone_number = phone_number, institution = inst, profileimg = str(phone_number) + '.png')
 				new_teacher.save()
 				user.save()
 				return Response("Saved teacher successfully!!", status=status.HTTP_201_CREATED)
 			except Exception as e:
 				print('Error is ', e)
 				return Response("Some error occurred", status=status.HTTP_401_UNAUTHORIZED)
-		
+
 		return Response("Error", status=status.HTTP_401_UNAUTHORIZED)
 
 
@@ -96,21 +106,21 @@ class TeacherViewSet(viewsets.GenericViewSet):
 		if Teacher.objects.filter(email__iexact = request.data['email']).exists():
 			user = verifyUser(request.data['email'], request.data['password'])
 			print('User:', user)
-			
+
 			if user is not False:
 				login(request, user)
 				d = UserSerializer(user).data
 				return Response(d, status=status.HTTP_200_OK)
 			else:
-				return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)	
+				return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)
 
-		return Response("Invalid teacher mail.", status=status.HTTP_401_UNAUTHORIZED)	
+		return Response("Invalid teacher mail.", status=status.HTTP_401_UNAUTHORIZED)
 
 
 	def change_password(self, request, name):
 		email = request.data['email']
 		key = request.data['key']
-		
+
 		if self.getKey(email)!=key:
 			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
@@ -127,13 +137,13 @@ class TeacherViewSet(viewsets.GenericViewSet):
 				print(e)
 				return Response(e, status=status.HTTP_401_UNAUTHORIZED)
 
-		return Response("Invalid Credentials", status=status.HTTP_401_UNAUTHORIZED)	
+		return Response("Invalid Credentials", status=status.HTTP_401_UNAUTHORIZED)
 
-	
+
 	def logout(self, request):
 		email = request.data['email']
 		key = request.data['key']
-		
+
 		if self.getKey(email)!=key:
 			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
@@ -143,7 +153,7 @@ class TeacherViewSet(viewsets.GenericViewSet):
 	# def approveStudent(self, request):
 	# 	key = request.data['key']
 	# 	email = request.data['email']
-		
+
 	# 	if self.getKey(email)!=key:
 	# 		return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 

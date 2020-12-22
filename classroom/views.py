@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 import datetime
 
-from .serializers import ClassroomSerializer, CreateClassroomSerializer, AddStudentSerializer, ViewStudentSerializer, NewAssignmentSerializer, ViewAssignmentSerializer, AddMarksSerializer, MarkAttendanceSerializer
+from .serializers import ClassroomSerializer, CreateClassroomSerializer, AddStudentSerializer, ViewStudentSerializer, NewAssignmentSerializer, ViewAssignmentSerializer, AddMarksSerializer, MarkAttendanceSerializer, SendEmailSerializer
 from institution.serializers import EmailSerializer
 
 from .models import Classroom, Studentlist, Assignment, Marks, Attendance
@@ -15,12 +15,14 @@ from teacher.models import Teacher
 from student.models import Student
 from users.models import CustomUser
 
+from .sendmails import sendMails
+
 class ClassroomViewSet(viewsets.GenericViewSet):
 
     default_serializer_class = ClassroomSerializer
     model = Classroom
     queryset = Classroom.objects.all()
-    
+
     serializer_classes = {
         "list": EmailSerializer,
         "create": CreateClassroomSerializer,
@@ -29,7 +31,8 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         "createassign": NewAssignmentSerializer,
         "viewassignments": ViewAssignmentSerializer,
         "addmarks" : EmailSerializer,
-        "markattendance" : EmailSerializer
+        "markattendance" : EmailSerializer,
+        "sendmails": SendEmailSerializer,
     }
 
     def get_serializer_class(self):
@@ -37,13 +40,13 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
     def getKey(self, email):
         user = CustomUser.objects.get(email=email)
-        return user.key    
+        return user.key
 
-    def list(self, request):  
+    def list(self, request):
         email = request.data['email']
         key = request.data['key']
         teacher_or_student = request.data['user'].lower()
-        
+
         if self.getKey(email)!=key:
             return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
@@ -72,7 +75,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
                 }
                 classlist.append(dictonary)
 
-        else:        
+        else:
             classlist = []
             for item in queryset:
                 dictonary = {
@@ -86,7 +89,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
                 classlist.append(dictonary)
 
         return Response(classlist, status=status.HTTP_200_OK)
-    
+
     def create(self, request):
         ser_data = CreateClassroomSerializer(data=request.data)
         teacher_email = request.data['teacher_email']
@@ -109,51 +112,6 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         else:
             return Response("Bad Request!!", status=status.HTTP_401_UNAUTHORIZED)
 
-
-    # def forstudent(self, request, studentid):
-    #     student = Student.objects.filter(id = studentid).first()
-    #     studentlists = Studentlist.objects.filter(student = student).all()
-        
-    #     classlist= []
-        
-    #     for lst in studentlists:
-    #         clas = Classroom.objects.filter(id = lst.classroom.id).first()
-    #         strength = len(Studentlist.objects.filter(classroom = clas))
-    #         dictonary ={
-    #             "classroom_id": lst.classroom.id,
-    #             "standard": lst.classroom.standard,
-    #             "section": lst.classroom.section,
-    #             "subject": lst.classroom.subject,
-    #             "teacher_name": lst.classroom.teacher.name,
-    #             "teacher_email": lst.classroom.teacher.email,
-    #             "strength" : strength
-    #         }
-    #         classlist.append(dictonary)
-
-    #     return Response(classlist, status=status.HTTP_200_OK)
-
-
-    # def forteacher(self, request, teacherid):
-    #     teacher = Teacher.objects.filter(id = teacherid).first()
-
-    #     classes = Classroom.objects.filter(teacher=teacher).all()
-    #     classlist= []
-    #     for clas in classes:
-    #         strength = len(Studentlist.objects.filter(classroom = clas))
-    #         dictonary ={
-    #             "standard": clas.standard,
-    #             "section": clas.section,
-    #             "subject": clas.subject,
-    #             "teacher_name": clas.teacher.name,
-    #             "teacher_email": clas.teacher.email,
-    #             "strength" : strength
-
-    #         }
-    #         classlist.append(dictonary)
-
-    #     return Response(classlist, status=status.HTTP_200_OK)
-
-      
     def addstudent(self, request):
         ser_data = AddStudentSerializer(data=request.data)
         class_id = request.data["classroom_id"]
@@ -173,13 +131,12 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
         if Studentlist.objects.filter(classroom = classroom, student = student).first() is not None:
             return Response("Student Already Exist!!", status=status.HTTP_401_UNAUTHORIZED)
-        
+
         addstudent = Studentlist(classroom=classroom, student=student)
         addstudent.save()
         student.status = True
         student.save()
         return Response("Succesfully Added Student!!", status=status.HTTP_200_OK)
-
 
     def viewstudents(self, request, classid):
         email = request.data['email']
@@ -192,9 +149,9 @@ class ClassroomViewSet(viewsets.GenericViewSet):
             clas = Classroom.objects.all().filter(id = classid).first()
             students = Studentlist.objects.filter(classroom = clas).all()
             stud_lst = []
-            
+
             for student in students:
-                
+
                 dictonary = {
                     "student_id" : student.student.id,
                     "student_name": student.student.name,
@@ -202,12 +159,11 @@ class ClassroomViewSet(viewsets.GenericViewSet):
                     "student_phone_no" : student.student.phone_number,
                 }
                 stud_lst.append(dictonary)
-            
-            return Response(stud_lst, status=status.HTTP_200_OK)
-        
-        except:
-            return Response("Error", status.HTTP_404_NOT_FOUND)    
 
+            return Response(stud_lst, status=status.HTTP_200_OK)
+
+        except:
+            return Response("Error", status.HTTP_404_NOT_FOUND)
 
     def createassign(self, request):
         ser_data = NewAssignmentSerializer(data=request.data)
@@ -221,9 +177,9 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
         classroom = Classroom.objects.filter(id = class_id).first()
         teacher = Teacher.objects.filter(email = teacher_email, status=True).first()
-        if teacher is None or classroom is None: 
+        if teacher is None or classroom is None:
             return Response("Bad Request!!", status=status.HTTP_401_UNAUTHORIZED)
-        
+
         newassign = Assignment(classroom=classroom, assign_url = link, title = request.data['title'])
         newassign.save()
         return Response("new assign created!!", status=status.HTTP_200_OK)
@@ -253,12 +209,12 @@ class ClassroomViewSet(viewsets.GenericViewSet):
             assignment = Assignment.objects.filter(id = assignment_id).first()
             student = Student.objects.filter(id = student_id).first()
             studmarks = Marks.objects.filter(assignment=assignment, student=student).first()
-            
+
             if studmarks is not None:
                 studmarks.marks_obtain = marksobtain
                 studmarks.totalmarks = totalmarks
                 studmarks.save()
-            
+
             else:
                 studmarks = Marks(assignment=assignment, student=student, marks_obtain=marksobtain, total_marks=totalmarks)
                 studmarks.save()
@@ -267,8 +223,8 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
     def viewbystudent(self, request, studentid):
         student = Student.objects.filter(id = studentid).first()
-        marks = Marks.objects.filter(student  =student).all()
-        
+        marks = Marks.objects.filter(student = student).all()
+
         marklist=[]
         for mark in marks:
             dictonary = {
@@ -284,7 +240,6 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
         return Response(marklist, status=status.HTTP_200_OK)
 
-    
     def viewbyclassroom(self, request, classroomid):
         classroom = Classroom.objects.filter(id = classroomid).first()
         assignments = Assignment.objects.filter(classroom = classroom).all()
@@ -307,7 +262,6 @@ class ClassroomViewSet(viewsets.GenericViewSet):
 
         return Response(marklist, status=status.HTTP_200_OK)
 
-
     def markattendance(self, request):
         teacher_email = request.data['email']
         key = request.data['key']
@@ -316,13 +270,13 @@ class ClassroomViewSet(viewsets.GenericViewSet):
             return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
         lis = list(request.data['list'])
-        
+
         for item in lis:
 
             student_id = item["student_id"]
             classroom_id = item["classroom_id"]
             attendance = item["attendance"]
-            
+
             student = Student.objects.filter(id = student_id).first()
             classroom = Classroom.objects.filter(id = classroom_id).first()
 
@@ -333,7 +287,6 @@ class ClassroomViewSet(viewsets.GenericViewSet):
                 pass
 
         return Response("Attendance saved!!", status=status.HTTP_200_OK)
-
 
     def viewattendance(self, request, classroomid):
         classroom = Classroom.objects.filter(id = classroomid).first()
@@ -350,7 +303,7 @@ class ClassroomViewSet(viewsets.GenericViewSet):
                 "attendance_id" : attendance.id,
                 "attendance_status" : stustatus,
                 "name" : attendance.student.name,
-                "date" : attendance.date,      
+                "date" : attendance.date,
             }
             attendancelist.append(dictonary)
 
@@ -361,19 +314,37 @@ class ClassroomViewSet(viewsets.GenericViewSet):
         student = Student.objects.filter(id = studentid).first()
         attendance_list = Attendance.objects.filter(classroom=classroom, student=student).all()
         attendancelist = []
-        
+
         for attendance in attendance_list:
             if attendance.attendance_status == True:
                 stustatus = "Present"
             else:
-                stustatus = "Absent"    
-            
+                stustatus = "Absent"
+
             dictonary = {
                 "attendance_id" : attendance.id,
                 "attendance_status" : stustatus,
                 "name" : attendance.student.name,
-                "date" : attendance.date,      
+                "date" : attendance.date,
             }
             attendancelist.append(dictonary)
 
         return Response(attendancelist, status=status.HTTP_200_OK)
+
+    def sendmails(self, request, classroomid):
+        teacher_email = request.data['email']
+        key = request.data['key']
+        message = request.data['message']
+
+        if self.getKey(teacher_email)!=key:
+            return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
+
+        classroom = Classroom.objects.filter(id = classroomid).first()
+        students = Studentlist.objects.filter(classroom = classroom)
+        student_emails = [item.student.email for item in students]
+        print(student_emails)
+
+        if sendMails(message, student_emails):
+            return Response('Mail sent successfully', status=status.HTTP_200_OK)
+
+        return Response('Some error', status = status.HTTP_400_BAD_REQUEST)

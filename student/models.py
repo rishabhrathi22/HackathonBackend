@@ -8,6 +8,7 @@ class Student(models.Model):
 	name = models.CharField(max_length=200)
 	phone_number = models.CharField(max_length=10)
 	status = models.BooleanField(default=False)
+	profileimg = models.ImageField(upload_to='student-images/')
 
 	def __str__(self):
 		return self.name + " - " + " - " + self.institution.institution_name

@@ -14,6 +14,7 @@ class StudentSignupSerializer(serializers.Serializer):
 	phone_number = serializers.CharField(max_length=15)
 	institution_email = serializers.EmailField()
 	password = serializers.CharField(max_length=200)
+	img = serializers.CharField(max_length = 1000000000000000)
 
 class StudentLoginSerializer(serializers.Serializer):
 	email = serializers.EmailField()

@@ -14,6 +14,8 @@ from .models import Student
 from institution.models import Institute
 from teacher.models import Teacher
 
+import base64
+
 def verifyUser(uname, pwd):
 	user = authenticate(email = uname, password = pwd)
 	if user is not None:
@@ -21,7 +23,7 @@ def verifyUser(uname, pwd):
 	return False
 
 class StudentViewSet(viewsets.GenericViewSet):
-	
+
 	default_serializer_class = StudentSerializer
 	model = Student
 	queryset = Student.objects.all()
@@ -37,23 +39,35 @@ class StudentViewSet(viewsets.GenericViewSet):
 	def getKey(self, email):
 		user = CustomUser.objects.get(email=email)
 		return user.key
- 
+
 	def get_serializer_class(self):
 		return self.serializer_classes.get(self.action, self.default_serializer_class)
 
 	def retrieve(self, request):
 		email = request.data['email']
 		key = request.data['key']
-		
+
 		if self.getKey(email)!=key:
 			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
 		queryset = Student.objects.all().filter(email__iexact = email)
-		if queryset is not None:
-			serializer = StudentSerializer(queryset, many=True)
-			return Response(serializer.data, status=status.HTTP_200_OK)
-		else:
+		if queryset is None:
 			return Response("Does not Exist.", status = status.HTTP_404_NOT_FOUND)
+
+		img_file = open('media/student-images/' + str(queryset[0].profileimg), "rb")
+		img_base64 = base64.b64encode(img_file.read())
+
+		student = {
+			"name": queryset[0].name,
+			"email": queryset[0].email,
+			"phone_number": queryset[0].phone_number,
+			"institution_email": queryset[0].institution.email,
+			"status": queryset[0].status,
+			"profileimg": img_base64
+		}
+
+		return Response(student, status = status.HTTP_200_OK)
+
 
 	def create(self, request):
 		ser_data = StudentSignupSerializer(data = request.data)
@@ -67,14 +81,18 @@ class StudentViewSet(viewsets.GenericViewSet):
 		if ser_data.is_valid():
 			try:
 				inst = Institute.objects.filter(email__iexact = inst_email).first()
-				new_student = Student(email=email, name=name, phone_number = phone_no, institution = inst) 
+				img = open('media/student-images/' + str(phone_no) + '.png', 'wb')
+				img.write(base64.b64decode(request.data['img']))
+				img.close()
+
+				new_student = Student(email=email, name=name, phone_number = phone_no, institution = inst, profileimg = str(phone_no) + '.png')
 				new_student.save()
 				user.save()
 				return Response("Saved student successfully!!", status=status.HTTP_201_CREATED)
 			except Exception as e:
 				print(e)
 				return Response("Some error occurred", status=status.HTTP_401_UNAUTHORIZED)
-		
+
 		return Response("Error", status=status.HTTP_401_UNAUTHORIZED)
 
 
@@ -88,15 +106,15 @@ class StudentViewSet(viewsets.GenericViewSet):
 				d = UserSerializer(user).data
 				return Response(d, status=status.HTTP_200_OK)
 			else:
-				return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)	
+				return Response("Invalid email or password.", status=status.HTTP_401_UNAUTHORIZED)
 
-		return Response("Invalid student mail.", status=status.HTTP_401_UNAUTHORIZED)	
+		return Response("Invalid student mail.", status=status.HTTP_401_UNAUTHORIZED)
 
 
 	def change_password(self, request, name):
 		email = request.data['email']
 		key = request.data['key']
-		
+
 		if self.getKey(email)!=key:
 			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
@@ -113,13 +131,13 @@ class StudentViewSet(viewsets.GenericViewSet):
 				print(e)
 				return Response(e, status=status.HTTP_401_UNAUTHORIZED)
 
-		return Response("Invalid Credentials", status=status.HTTP_401_UNAUTHORIZED)	
+		return Response("Invalid Credentials", status=status.HTTP_401_UNAUTHORIZED)
 
-	
+
 	def logout(self, request):
 		email = request.data['email']
 		key = request.data['key']
-		
+
 		if self.getKey(email)!=key:
 			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
