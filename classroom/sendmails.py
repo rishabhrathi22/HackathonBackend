@@ -15,11 +15,8 @@ def sendMails(HTML, receiver_email):
 	# Setting configuration values
 	port = 465
 	smtp_server = "smtp.gmail.com"
-	# sender_email = 'oathtocode@gmail.com'
-	# pwd = 'hackathon@12#21'
-
-	sender_email = 'o1devmail@gmail.com'
-	pwd = 'O(logn)base2'
+	sender_email = 'oathtocode@gmail.com'
+	pwd = 'hackathon@12#21'
 
 	message = MIMEMultipart("alternative", None, [MIMEText(HTML, 'html')])
 	message['Subject'] = 'Classroom'
