@@ -24,3 +24,10 @@ class StudentChangePasswordSerializer(serializers.Serializer):
 	email = serializers.EmailField()
 	password = serializers.CharField(max_length=200)
 	newpass = serializers.CharField(max_length=200)
+
+class ChatMessageSerializer(serializers.Serializer):
+	teacher = serializers.EmailField()
+	classid = serializers.IntegerField()
+	email = serializers.EmailField()
+	key = serializers.CharField(max_length = 200)
+	message = serializers.CharField(max_length = 1000)

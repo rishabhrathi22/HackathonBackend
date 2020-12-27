@@ -18,7 +18,6 @@ from student.models import Student
 
 import base64
 
-
 def verifyUser(uname, pwd):
 	user = authenticate(email = uname, password = pwd)
 	if user is not None:

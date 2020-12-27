@@ -90,10 +90,21 @@ WSGI_APPLICATION = 'hackathon.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'dt36c8e362lu3',
+        'USER': 'hcxcbqxjzsosej',
+        'PASSWORD': 'a68902f6bf40ab185c2ab152f55f1013b6be603d8408705b93cf7d7fee245506',
+        'HOST': 'ec2-54-86-57-171.compute-1.amazonaws.com',
+        'PORT': '5432',
     }
 }
 

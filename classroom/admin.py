@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Classroom, Studentlist, Assignment, Marks, Attendance
+from .models import Classroom, Studentlist, Assignment, Marks, Attendance, Chats
 
 class ClassroomAdmin(admin.ModelAdmin):
 	list_display = ['teacher', 'standard', 'section', 'subject']
@@ -22,12 +22,18 @@ class MarksAdmin(admin.ModelAdmin):
 	ordering = ('assignment',)
 
 class AttendanceAdmin(admin.ModelAdmin):
-	list_display = ['student', 'classroom', 'date', 'attendance_status']    
+	list_display = ['student', 'classroom', 'date', 'attendance_status']
 	search_fields = ('student',)
-	ordering = ('date',)    
+	ordering = ('date',)
+
+class ChatAdmin(admin.ModelAdmin):
+	list_display = ['classroom', 'student', 'messages']
+	search_fields = ('student', 'classroom', )
+	ordering = ('classroom',)
 
 admin.site.register(Classroom, ClassroomAdmin)
 admin.site.register(Studentlist, StudentListAdmin)
 admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Marks, MarksAdmin)
 admin.site.register(Attendance, AttendanceAdmin)
+admin.site.register(Chats, ChatAdmin)

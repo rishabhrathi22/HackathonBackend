@@ -6,15 +6,17 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.decorators import action
 
-from .serializers import StudentSerializer, StudentSignupSerializer, StudentLoginSerializer, StudentChangePasswordSerializer
+from .serializers import StudentSerializer, StudentSignupSerializer, StudentLoginSerializer, StudentChangePasswordSerializer, ChatMessageSerializer
 from institution.serializers import EmailSerializer
 from users.serializers import UserSerializer
 
 from .models import Student
 from institution.models import Institute
 from teacher.models import Teacher
+from classroom.models import Chats, Classroom
 
 import base64
+from datetime import datetime
 
 def verifyUser(uname, pwd):
 	user = authenticate(email = uname, password = pwd)
@@ -34,6 +36,7 @@ class StudentViewSet(viewsets.GenericViewSet):
 		'login': StudentLoginSerializer,
 		'logout': EmailSerializer,
 		'change_password': StudentChangePasswordSerializer,
+		'chat_with_teacher': ChatMessageSerializer,
 	}
 
 	def getKey(self, email):
@@ -143,3 +146,39 @@ class StudentViewSet(viewsets.GenericViewSet):
 
 		logout(request)
 		return Response("Successfully logged out.", status = status.HTTP_200_OK)
+
+	def chat_with_teacher(self, request):
+		ser_data = ChatMessageSerializer(data = request.data)
+		if ser_data.is_valid():
+			email = request.data['email']
+			key = request.data['key']
+
+			if self.getKey(email)!=key:
+				return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
+
+			d = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
+			previous_chats = Chats.objects.filter(student__email__iexact = email, classroom__id = request.data['classid'])
+			msg = {"data": [{'sender': 'student', 'datetime': d, 'message': request.data['message']}]}
+
+			if previous_chats.exists():
+				try:
+					new_chats = previous_chats[0].messages['data'] + [{'sender': 'student', 'datetime': d, 'message': request.data['message']}]
+					obj = previous_chats[0]
+					obj.messages = {'data': new_chats}
+					obj.save()
+
+				except Exception as e:
+					print(e)
+					return Response('Error', status = status.HTTP_404_NOT_FOUND)
+
+			else:
+				try:
+					c = Chats(student = Student.objects.get(email__iexact = email), classroom = Classroom.objects.get(id = request.data['classid']), messages = msg)
+					c.save()
+				except Exception as e:
+					print(e)
+					return Response('Error', status = status.HTTP_404_NOT_FOUND)
+
+			return Response('Done', status = status.HTTP_200_OK)
+
+		return Response('Incorrect data', status = status.HTTP_400_BAD_REQUEST)
