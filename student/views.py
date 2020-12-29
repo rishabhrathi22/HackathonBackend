@@ -55,6 +55,25 @@ class StudentViewSet(viewsets.GenericViewSet):
 		else:
 			return Response("Does not Exist.", status = status.HTTP_404_NOT_FOUND)
 
+<<<<<<< Updated upstream
+=======
+		img_file = open('media/student-images/' + str(queryset[0].profileimg), "rb")
+		img_base64 = base64.b64encode(img_file.read())
+
+		student = {
+			"id" : queryset[0].id,
+			"name": queryset[0].name,
+			"email": queryset[0].email,
+			"phone_number": queryset[0].phone_number,
+			"institution_email": queryset[0].institution.email,
+			"status": queryset[0].status,
+			"profileimg": img_base64
+		}
+
+		return Response(student, status = status.HTTP_200_OK)
+
+
+>>>>>>> Stashed changes
 	def create(self, request):
 		ser_data = StudentSignupSerializer(data = request.data)
 		inst_email = request.data['institution_email']
