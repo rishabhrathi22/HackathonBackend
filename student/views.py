@@ -49,19 +49,22 @@ class StudentViewSet(viewsets.GenericViewSet):
 	def retrieve(self, request):
 		email = request.data['email']
 		key = request.data['key']
-
+		
 		if self.getKey(email)!=key:
 			return Response("Not logged in.", status = status.HTTP_401_UNAUTHORIZED)
 
 		queryset = Student.objects.all().filter(email__iexact = email)
-		if queryset is None:
+		if queryset is not None:
+			serializer = StudentSerializer(queryset, many=True)
+			return Response(serializer.data, status=status.HTTP_200_OK)
+		else:
 			return Response("Does not Exist.", status = status.HTTP_404_NOT_FOUND)
 
 		img_file = open('media/student-images/' + str(queryset[0].profileimg), "rb")
 		img_base64 = base64.b64encode(img_file.read())
 
 		student = {
-			"id":  queryset[0].id,
+			"id" : queryset[0].id,
 			"name": queryset[0].name,
 			"email": queryset[0].email,
 			"phone_number": queryset[0].phone_number,
