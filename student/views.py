@@ -61,6 +61,7 @@ class StudentViewSet(viewsets.GenericViewSet):
 		img_base64 = base64.b64encode(img_file.read())
 
 		student = {
+			"id":  queryset[0].id,
 			"name": queryset[0].name,
 			"email": queryset[0].email,
 			"phone_number": queryset[0].phone_number,
